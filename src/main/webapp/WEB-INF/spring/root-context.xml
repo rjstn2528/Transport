@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xsi:schemaLocation="http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+        http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+    <!-- Root Context: defines shared resources visible to all other web components -->
+    
+    <!-- Properties 파일 로드 -->
+    <context:property-placeholder location="classpath:config/*.properties"/>        
+     
+    <!-- 컴포넌트 스캔 (컨트롤러 제외) -->
+    <context:component-scan base-package="net.koreate.transport">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+     
+    <!-- Oracle Database HikariCP 설정 -->
+    <bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="jdbcUrl" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}" />
+        <property name="password" value="${jdbc.password}" />
+        <property name="maximumPoolSize" value="20" />
+        <property name="minimumIdle" value="10" />
+        <property name="connectionTimeout" value="300000"/>
+        <property name="idleTimeout" value="200000"/>
+        <property name="maxLifetime" value="1200000"/>
+    </bean>
+     
+    <!-- DataSource -->
+    <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource">
+        <constructor-arg ref="hikariConfig"/>
+    </bean>
+     
+    <!-- MyBatis SqlSessionFactory (어노테이션 방식용) -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <!-- ✅ 어노테이션 방식에서는 mapperLocations 제거! -->
+        <property name="typeAliasesPackage" value="net.koreate.transport.vo"/>
+        <property name="configurationProperties">
+            <props>
+                <prop key="mapUnderscoreToCamelCase">true</prop>
+                <prop key="callSettersOnNulls">true</prop>
+                <prop key="jdbcTypeForNull">VARCHAR</prop>
+                <!-- 개발시에만 로깅 활성화 -->
+                <prop key="logImpl">STDOUT_LOGGING</prop>
+            </props>
+        </property>
+    </bean>
+    
+    <!-- SqlSession Template -->
+    <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg ref="sqlSessionFactory"/>
+    </bean>
+    
+    <!-- ✅ MyBatis Mapper 스캔 (어노테이션 방식 핵심!) -->
+    <mybatis-spring:scan base-package="net.koreate.transport.dao"/>   
+     
+    <!-- Transaction Manager -->
+    <bean id="transactionManager"
+            class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+  
+    <!-- @Transactional annotation 기반 transaction 제어 -->
+    <tx:annotation-driven/>
+     
+    <!-- RestTemplate Bean 설정 -->
+	<!-- 기존 RestTemplate 설정을 다음과 같이 변경 -->
+	<bean id="restTemplate" class="org.springframework.web.client.RestTemplate">
+	    <property name="requestFactory">
+	        <bean class="org.springframework.http.client.HttpComponentsClientHttpRequestFactory">
+	            <!-- 크롤링을 위한 타임아웃 증가 -->
+	            <property name="connectTimeout" value="30000" />    <!-- 30초 -->
+	            <property name="readTimeout" value="120000" />      <!-- 2분 -->
+	        </bean>
+	    </property>
+	</bean>
+	
+	<!-- 추가: 크롤링 전용 RestTemplate (선택사항) -->
+	<bean id="crawlerRestTemplate" class="org.springframework.web.client.RestTemplate">
+	    <property name="requestFactory">
+	        <bean class="org.springframework.http.client.HttpComponentsClientHttpRequestFactory">
+	            <property name="connectTimeout" value="30000" />    <!-- 30초 -->
+	            <property name="readTimeout" value="180000" />      <!-- 3분 -->
+	        </bean>
+	    </property>
+	</bean>
+    
+    <!-- ObjectMapper Bean 등록 (JSON 처리용) -->
+    <bean id="objectMapper" class="com.fasterxml.jackson.databind.ObjectMapper" />
+    
+    <!-- JdbcTemplate Bean 추가 -->
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+	    <property name="dataSource" ref="dataSource"/>
+	</bean>
+     
+</beans>
