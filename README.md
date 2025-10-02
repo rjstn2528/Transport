@@ -59,17 +59,23 @@ API 출처: ODsay Public Transportation API <br>
 
 ##  개발 환경   
 
-<div align="center">
-  
-<br>
-Java / JSP / HTML5 / CSS3 </br>
-<br>
-JavaScript / Spring Framework
-</br>
-<br>
-Apache Tomcat / Oracle DB / Maven / Python
-</br>
-</div>
+**언어 / 웹 기술**  
+![Java](https://img.shields.io/badge/Java-ED8B00?style=flat&logo=java&logoColor=white)  
+![JSP](https://img.shields.io/badge/JSP-007396?style=flat&logo=jsp&logoColor=white)  
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)  
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)  
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)  
+
+**프레임워크 / 라이브러리**  
+![Spring](https://img.shields.io/badge/Spring-6DB33F?style=flat&logo=spring&logoColor=white)  
+
+**서버 / DB / 빌드 도구**  
+![Apache Tomcat](https://img.shields.io/badge/Apache_Tomcat-F8DC75?style=flat&logo=apachetomcat&logoColor=black)  
+![Oracle](https://img.shields.io/badge/Oracle-F80000?style=flat&logo=oracle&logoColor=white)  
+![Maven](https://img.shields.io/badge/Maven-C71A36?style=flat&logo=apachemaven&logoColor=white)  
+
+**기타**  
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)
 
 
 ## 🗃 프로젝트 구조
